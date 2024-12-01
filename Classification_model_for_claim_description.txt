@@ -1,0 +1,56 @@
+Documentation for the Classification Models on Claims Data
+This documentation provides an overview of the processes, including data preprocessing, model development, and prediction steps, involved in the claims classification task. The dataset consists of claim descriptions, with the goal of predicting two target variables: Coverage Code and Accident Source.
+ 1. Dataset Overview
+The dataset used in this task is a collection of insurance claims with various columns, including:
+- Claim Description: Textual descriptions of the claims.
+- Coverage Code: A categorical target variable indicating the type of coverage.
+- Accident Source: Another categorical target variable indicating the source of the accident.
+The dataset was read from an Excel file and initial exploration was done to examine the structure and missing values.
+2. Preprocessing Steps
+2.1 Duplicate Removal
+The first step involved checking for and removing duplicate entries in the "Claim Description" column, ensuring that each description is unique.
+2.2 Text Preprocessing
+To prepare the claim descriptions for model input, several text preprocessing steps were applied:
+- Lowercasing: All text was converted to lowercase to ensure uniformity.
+- Special Character Replacement: Specific characters like `@`, `!`, and others were replaced with text equivalents to standardize the data.
+- Handling Math Expressions: The text `[Math]` was replaced with the string "math".
+- Decontracting Words: Common contractions (e.g., "ain't", "amn't") were expanded to their full form.
+- HTML Tag Removal: HTML tags, if present, were stripped using BeautifulSoup.
+- Punctuation Removal: Non-word characters (punctuation marks) were removed from the text.
+2.3 Null Value Removal
+Rows containing null values were removed from the dataset to ensure completeness and avoid errors during model training.
+ 2.4 Class Conversion
+The target variable, Coverage Code, was examined for class imbalance, and categories with fewer than 10 occurrences were classified as "few". A similar transformation was applied to the Accident Source variable.
+3. Model Development
+3.1 Logistic Regression Models
+The classification task was performed using Logistic Regression, a popular model for categorical prediction tasks.
+Two separate stages were involved in model building:
+- Stage 1 (Coverage Code Classification): A logistic regression model was trained to classify the Coverage Code based on the claim descriptions. The dataset was split into training and testing sets, and the model was trained using the `CountVectorizer` to convert text data into numerical vectors.
+- Stage 2 (Accident Source Classification): Similar to the first stage, a second logistic regression model was developed to predict the Accident Source from the text data. The model was trained on a subset of the data with balanced class distributions.
+3.2 Model Evaluation
+For both stages, the models were evaluated using standard classification metrics, including:
+- Accuracy: The overall correctness of the model’s predictions.
+- Confusion Matrix: A table showing the performance of the classification model, with counts of actual versus predicted class labels.
+- Classification Report: A detailed report providing precision, recall, F1-score, and support for each class.
+The models achieved accuracy scores of approximately 73% in both stages for predicting the Coverage Code and a lower accuracy of around 45% for predicting the Accident Source.
+ 4. Handling Data Imbalance
+The dataset exhibited some class imbalance, particularly for Coverage Code and Accident Source. To mitigate this:
+- Fewer Classes: Classes with fewer than 10 occurrences were grouped into a category labeled as "fewer".
+- Medium Classes: Classes with moderate occurrences were also identified and handled separately.
+A dictionary approach was used for classes with very few occurrences, and custom mappings were applied to improve predictions for these classes.
+ 5. Model Prediction
+A custom prediction function was created to predict the target classes for a given claim description. The function works as follows:
+1. The input claim description is preprocessed and converted into a vector using the `CountVectorizer`.
+2. The description is then passed through the first stage model to predict the Coverage Code.
+3. If the predicted Coverage Code is classified as "med", the second model is used to predict the Accident Source.
+Additionally, predictions for a sample of claim descriptions were generated, and the accuracy and other metrics were calculated for the predicted classes.
+ 6. Model Saving and Deployment
+After training and evaluating the models, they were saved using the `pickle` library, allowing for easy deployment and later use. The saved models are:
+- Coverage Code Model (`logistic_regression_cc_1st_stg.pickle` and `logistic_regression_cc_2nd_stg.pickle`)
+- Accident Source Model (`logistic_regression_as_1st_stg.pickle`)
+7. Conclusion
+The developed models provide a solution for classifying insurance claims based on their descriptions, predicting the Coverage Code and Accident Source. While the model for Coverage Code showed reasonable accuracy, the model for Accident Source performed less well, potentially due to the high class imbalance and the complexity of the task.
+Future improvements may include:
+- Hyperparameter Tuning: To optimize model performance.
+- Addressing Data Imbalance: Using techniques like SMOTE or oversampling.
+- Advanced Models: Experimenting with more complex models like LightGBM or deep learning approaches to improve accuracy, particularly for the Accident Source classification.
